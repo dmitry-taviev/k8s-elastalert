@@ -1,0 +1,21 @@
+es_host: elasticsearch-logging.kube-system.svc.cluster.local
+es_port: 9200
+name: ModelCreatorAlert
+type: frequency
+index: logstash-*
+num_events: 2
+timeframe:
+  minutes: 1
+filter:
+- term:
+    kubernetes.container_name: "clip-model-creator"
+- term:
+    kubernetes.namespace_name: "dev"
+- query:
+    query_string:
+      query: "log: Warning"
+alert:
+- "slack"
+slack:
+slack_webhook_url: "https://hooks.slack.com/services/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"
+slack_channel_override: "#elastalert-testing"
