@@ -19,16 +19,17 @@ node {
         def dockerRepo = "944590742144.dkr.ecr.${region}.amazonaws.com/${repoName}"
         def img = docker.build("${dockerRepo}:build-${env.BUILD_NUMBER}")
         img.push()
+        img.push('latest')
         slackSend color: 'good', message: "[<${env.BUILD_URL}|${env.JOB_NAME}:${env.BUILD_NUMBER}>] New image: ${img.id}"
 
-		stage 'deploy service to production'
-        slackSend("[<${env.BUILD_URL}|${env.JOB_NAME}:${env.BUILD_NUMBER}>] Deploying to Production..")
+		stage 'deploy service'
+        slackSend("[<${env.BUILD_URL}|${env.JOB_NAME}:${env.BUILD_NUMBER}>] Deploying..")
         try {
-            sh("kubectl rolling-update ${service} --namespace=kube-system --image=${img.id} --container=${service}")
-            img.push('latest')
+            sh("kubectl delete rc --namespace=kube-system ${service}")
+            sleep 30
+            sh("kubectl create --namespace=kube-system -f rc.yaml")
         } catch (failure) {
-            slackSend color: 'danger', message: "[<${env.BUILD_URL}|${env.JOB_NAME}:${env.BUILD_NUMBER}>] Failed to update service, rolling back.."
-            sh("kubectl rolling-update ${service} --namespace=kube-system --rollback")
+            slackSend color: 'danger', message: "[<${env.BUILD_URL}|${env.JOB_NAME}:${env.BUILD_NUMBER}>] Failed to update service!"
         }
 
 	} catch (e) {
