@@ -27,12 +27,19 @@ spec:
           volumeMounts:
             - mountPath: /usr/share/elasticsearch/data
               name: elastalert-volume
+          resources:
+            limits:
+              cpu: 100m
+              memory: 500Mi
+          env:
+            - name: ES_HEAP_SIZE
+              value: 400m
         - name: elastalert
           image: 944590742144.dkr.ecr.eu-west-1.amazonaws.com/apply/smart-elastalert:latest
           resources:
             limits:
               cpu: 100m
-              memory: 200Mi
+              memory: 100Mi
           env:
             - name: ELASTICSEARCH_HOST
               value: "localhost"
