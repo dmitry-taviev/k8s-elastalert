@@ -1,0 +1,23 @@
+es_host: localhost
+es_port: 5555
+name: "Channel recording problem"
+index: logstash-*
+type: flatline
+threshold: 9
+timeframe:
+  minutes: 10
+query_key: kubernetes.pod_name
+filter:
+- term:
+    kubernetes.container_name: dvr-gen2
+- term:
+    kubernetes.namespace_name: default
+- query:
+    query_string:
+      query: >
+        log: "Fragment sending done"
+alert:
+- "slack"
+slack:
+slack_webhook_url: "https://hooks.slack.com/services/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"
+slack_channel_override: "#smrt"
