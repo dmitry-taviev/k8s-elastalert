@@ -1,5 +1,5 @@
-es_host: localhost
-es_port: 5555
+es_host: elasticsearch-logging.kube-system.svc.cluster.local
+es_port: 9200
 name: "Channel recording problem"
 index: logstash-*
 type: flatline
